@@ -1,0 +1,123 @@
+import csv
+import matplotlib.pyplot as plt
+import numpy as np
+inputfile = "galaxies.csv"
+
+#data extraction:
+list_data = []
+string_data = []
+with open(inputfile, "rt") as f:
+    reader = csv.reader(f, delimiter="\t")
+    for row in reader:
+        list_data.append(row)
+        string = str(row)
+        string_data.append(string)
+del(string_data[0])
+x_co= []
+y_co= []
+for i in (range(0 , len(string_data))):
+    string_data[i] = string_data[i].replace("'", "")
+    split = string_data[i].split(" ")        
+
+    x = str(split[0])
+    xr = x.replace("[" , "")
+    x_value = float(xr)
+    x_co.append(x_value)
+
+for i in (range(0 , len(string_data))):
+    string_data[i] = string_data[i].replace("'", "")
+    split = string_data[i].split(" ")        
+
+    y = str(split[1])
+    yr = y.replace("]" , "")
+    y_value = float(yr)
+    y_co.append(y_value)
+
+
+#scatter plot
+plt.scatter(x_co,y_co)
+plt.title("Galaxy scatter plots")
+plt.xlabel("Distance in Mpc")
+plt.ylabel("Distance in Mpc")
+
+#figuring out where each galaxy is in the grid
+# l values = 25 , 50 , 100 , 125 , 250 , 500
+box_x = []
+box_y = []
+ 
+l = 20
+
+for i in range(0 , len(x_co)):
+    lower_limit_x =  x_co[i]//l
+    box_x.append(lower_limit_x)
+    
+
+for i in range(0 , len(y_co)):
+    lower_limit_y = y_co[i]//l
+    box_y.append(lower_limit_y)
+
+grid_numbers = np.arange(-500 , 500 , l )/l 
+
+array = np.zeros((int(1000/l),int(1000/l)))
+
+galaxy_counts = []
+densities = []
+area = (10**9/(1000/l))**2
+
+for x in grid_numbers:
+     for y in grid_numbers:
+         
+        j_counter = []
+        ij_counter = []
+        area = (10**9/(1000/l))**2
+
+        for j in range(0 , len(box_x)):
+        
+            if box_x[j] == x:
+                j_counter.append(j)
+
+        for i in j_counter:
+            if box_y[i] == y:
+                ij_counter.append(i)
+            
+            x_ar = int (x + 500/l)
+            y_ar = int (y + 500/l)
+
+            array[y_ar , x_ar] = len(ij_counter)
+
+        galaxy_counts.append(ij_counter)
+        desity = i/ area
+        densities.append(desity)
+
+#heat maps:
+fig, ax = plt.subplots()
+im = ax.imshow(array, origin='lower')
+plt.title("Heat map for l = {}".format(l))
+#Add a colorbar to the subplot
+cbar = fig.colorbar(im, ax=ax)
+
+plt.show()
+
+#mean and std of densities:       
+density_mean = np.mean(densities)
+density_std = np.std(densities)
+print("for l = {} , mean density is: {} and std is:{}".format(l, density_mean, density_std)) 
+print("if you want to see these values for a different l, feel free to change the value l i line 48, using any value given in line 44")
+
+#by running this code for differents ls, we get mean and nstd values for each grid size:
+means = [2.4985415e-10, 3.999117999999999e-11, 9.999149999999995e-12, 6.399376e-12, 1.59994e-12, 3.9999e-13]
+stds = [1.3771039358015328e-13, 8.055283980096245e-15, 5.9371710435213185e-16, 7.038181583334805e-16, 4.2895221178991353e-17, 5.9999999999799815e-18]
+ls = [20, 50, 100, 125, 250, 500]
+
+#plotting STD in relation to the size of the grid :
+plt.scatter(ls , stds, linestyle='-', marker='o')
+plt.title("STD in relation to the size of the grid (l)")
+plt.xlabel("l (Mpc)")
+plt.ylabel("STD")
+plt.show()
+
+# lowst std happens when l is the largest (in this example, l = 500)
+
+
+
+
