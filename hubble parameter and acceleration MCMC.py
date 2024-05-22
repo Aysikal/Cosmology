@@ -80,7 +80,7 @@ def penalty(m , z , H0, q0, dm):
 # ## phase space
 
 # %%
-'''
+
 # Create x and y values
 q0_ax = np.linspace(-5, 5, 100)
 H0_ax = np.linspace(60, 90, 100)
@@ -108,7 +108,7 @@ ax = fig.add_subplot(111, projection='3d')
 surf = ax.plot_surface(X, Y, Z, cmap='viridis')
 fig.colorbar(surf)
 plt.show()
-'''
+
 
 
 # %% [markdown]
